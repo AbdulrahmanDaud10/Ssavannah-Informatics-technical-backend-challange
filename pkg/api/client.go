@@ -24,19 +24,14 @@ type (
 )
 
 // GetAfricasTalkingSettings returns an instance of an Africa's Talking client reusbale across different products.
-func GetAfricasTalkingSettings(apiKey string, username string, sandbox bool) *AtClient {
+func GetAfricasTalkingSettings(apiKey string, username string, URLendPoint string) *AtClient {
 	AtClient := &AtClient{
-		ApiKey: apiKey,
+		ApiKey:   apiKey,
+		Endpoint: BASESANDBOXENDPOINT,
 		httpClient: &http.Client{
 			Timeout: time.Second * 10,
 		},
 		Username: username,
-	}
-
-	if sandbox {
-		AtClient.Endpoint = BASESANDBOXENDPOINT
-	} else {
-		AtClient.Endpoint = BASELIVEENDPOINT
 	}
 
 	fmt.Println("##############################", AtClient)
