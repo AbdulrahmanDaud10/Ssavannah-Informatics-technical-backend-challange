@@ -3,6 +3,7 @@ package app
 import (
 	"log"
 	"net/http"
+	"os"
 
 	"github.com/AbdulrahmanDaud10/savannah-info-customer-order-service/pkg/api"
 	"github.com/gin-gonic/gin"
@@ -11,7 +12,7 @@ import (
 func GetAfricasTalkingSettingsHandler(c *gin.Context) {
 	apiKey := c.Query("apiKey")
 	username := c.Query("username")
-	sandbox := c.Query("sandbox") == "true"
+	sandbox := c.Query("sandbox")
 
 	if apiKey == "" || username == "" {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Missing required parameters"})
@@ -24,20 +25,24 @@ func GetAfricasTalkingSettingsHandler(c *gin.Context) {
 }
 
 // SendAfricasTalkingBulkSMSHandler takes expected input from the request and sends the message
-func SendAfricasTalkingBulkSMSHandler(c *gin.Context) {
+func SendAfricasTalkingBulkSMSHandler(ctx *gin.Context) {
 	expectedInput := struct {
 		Message    string   `json:"message"`
 		Recipients []string `json:"recipients"`
 	}{}
-	c.Bind(&expectedInput)
+	ctx.Bind(&expectedInput)
 
-	var sandbox api.AfricasTalkingSettings
-	africasTalkingSettings, err := api.GetAfricasTalkingSettings(apiKey, username, sandbox)
+	apiKey := os.Getenv("")
+	username := os.Getenv("AFRICASTALKING_API_KEY_SETTINGS_LABEL")
+	endPoint := os.Getenv("AFRICASTALKING_BASELIVE_ENDPOINT")
+
+	err := api.GetAfricasTalkingSettings(apiKey, username, endPoint)
 	if err != nil {
 		log.Fatal("error getting africa's Talking settings")
+		return
 	}
 
-	Err := api.SendAfricastalkingBulkSMS(africasTalkingSettings, expectedInput.Message, expectedInput.Recipients)
+	Err := api.SendAfricastalkingBulkSMS(expectedInput.Message, expectedInput.Recipients)
 	if Err != nil {
 		log.Fatal("error sending sms via africa's talking")
 

@@ -41,16 +41,10 @@ type (
 			Recipients []BulkSMSRecipient `json:"recipients"`
 		} `json:"SMSMessageData"`
 	}
-
-	AfricasTalkingSettings struct {
-		ApiKey   string `json:"api_key"`
-		Username string `json:"username"`
-		Endpoint string `json:"endpoint"`
-	}
 )
 
 // SendAfricastalkingBulkSMS uses Tuma settings to send a message to multiple phone numbers
-func SendAfricastalkingBulkSMS(africasTalkingSettings AfricasTalkingSettings, message string, recipients []string) error {
+func SendAfricastalkingBulkSMS(message string, recipients []string) error {
 
 	bulkMessages := []map[string]string{}
 	for _, recipient := range recipients {
@@ -61,7 +55,7 @@ func SendAfricastalkingBulkSMS(africasTalkingSettings AfricasTalkingSettings, me
 	}
 
 	africastalkingRequestBody := map[string]interface{}{
-		"api_key": AfricasTalkingSettings.ApiKey,
+		"api_key": AfricasTalkingApiKey,
 		"batch":   bulkMessages,
 	}
 
@@ -73,7 +67,7 @@ func SendAfricastalkingBulkSMS(africasTalkingSettings AfricasTalkingSettings, me
 	}
 	request, httpError := http.NewRequest(http.MethodPost, BaseSandboxEndpoint, bytes.NewBuffer(jsonBody))
 	request.Header.Set("Content-Type", "application/json")
-	request.Header.Set("api-key", africasTalkingSettings.ApiKey)
+	request.Header.Set("api-key", AfricasTalkingApiKey)
 
 	if httpError != nil {
 		log.Fatal(httpError)
@@ -99,5 +93,4 @@ func SendAfricastalkingBulkSMS(africasTalkingSettings AfricasTalkingSettings, me
 }
 
 func SendNotificationSMSAfterOrder() {
-
 }
